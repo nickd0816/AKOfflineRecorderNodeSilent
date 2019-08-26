@@ -33,7 +33,7 @@ class ViewController: UIViewController {
         
         let time = AVAudioTime(sampleTime: 0, atRate: offlineRenderer.avAudioNode.inputFormat(forBus: 0).sampleRate)
         player.play(at: time)
-        try! offlineRenderer.renderToURL(url, duration: player.duration)
+        try! offlineRenderer.renderToURL(url, duration: player.duration, settings: [AVFormatIDKey: kAudioFormatMPEG4AAC])
         
         player.stop()
         player.disconnectOutput()
