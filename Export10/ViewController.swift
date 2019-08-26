@@ -19,26 +19,27 @@ class ViewController: UIViewController {
         let url = URL(fileURLWithPath: (NSSearchPathForDirectoriesInDomains(.documentDirectory, .allDomainsMask, true)[0] as NSString).appendingPathComponent("result.aac"))
         print(url)
         
-        //AVAudioTime.secondsToAudioTime(hostTime: 0, time: 0)
-        //player.audioTime(at: 0)
-        
         AudioKit.output = offlineRenderer
         
         offlineRenderer.internalRenderEnabled = false
         try! AudioKit.start()
         
+        // I also tried using AKAudioPlayer instead of AKPlayer
+        // Also tried getting time in these ways:
+        // AVAudioTime.secondsToAudioTime(hostTime: 0, time: 0)
+        // player.audioTime(at: 0)
+        // And for hostTime I've tried 0 as well as mach_absolute_time()
+        // None worked
+        
         let time = AVAudioTime(sampleTime: 0, atRate: offlineRenderer.avAudioNode.inputFormat(forBus: 0).sampleRate)
         player.play(at: time)
-        let buffer = try! offlineRenderer.renderToBuffer(for: player.duration)
+        try! offlineRenderer.renderToURL(url, duration: player.duration)
         
         player.stop()
         player.disconnectOutput()
         offlineRenderer.internalRenderEnabled = true
         
-        let file = try! AVAudioFile(forWriting: url, settings: [AVFormatIDKey: kAudioFormatMPEG4AAC])
-        
-        try! file.write(from: buffer)
-        print("Done")
+        try? AudioKit.stop()
     }
 
 }
